@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, defineComponent, onMounted, watchEffect } from 'vue'
-import { dummy_tokens, dummy_tokens_account } from '../dummy/tokens'
 import { math } from '../utils/math'
+import { $assetApi } from '../services/api.service'
 
 const props = defineProps<{ loggedIn: boolean }>()
 
@@ -9,15 +9,12 @@ const total = ref<String>('0')
 const tokens = ref<any>({})
 
 const fetchTokens = async () => {
-  // const res = await fetch('https://papi.boraportal.com/assets/v1/tokens', {
-  //   method: 'GET'
-  // })
-  // console.log({res})
-
   if(props.loggedIn) {
-    tokens.value = dummy_tokens_account.payload;
+    const res = await $assetApi.getTokensAccount()
+    tokens.value = res;
   } else {
-    tokens.value = dummy_tokens.payload;
+    const res = await $assetApi.getTokens()
+    tokens.value = res;
   }
 }
 
@@ -35,8 +32,8 @@ onMounted(async () => {
   await fetchTokens();
 })
 
-watchEffect(() => { 
-  fetchTokens()
+watchEffect(async () => { 
+  await fetchTokens()
   if(props.loggedIn) {
     total.value = sum()
   } else {

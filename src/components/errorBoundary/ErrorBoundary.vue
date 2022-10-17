@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // https://github.com/dillonchanis/vue-error-boundary/blob/main/src/VErrorBoundary.vue
-import { ref, onErrorCaptured, useSlots } from "vue";
+import { defineComponent, ref, onErrorCaptured, useSlots } from "vue";
 import type { Component } from "vue";
 import DefaultFallback from "./DefaultFallback.vue";
 
@@ -54,3 +54,9 @@ onErrorCaptured((error: Error, vm, info: string) => {
     v-bind="params"
   ></slot>
 </template>
+
+<script lang="ts">
+export default defineComponent({
+  name: "ErrorBoundary",
+});
+</script>

@@ -1,10 +1,12 @@
 <script setup lang="ts">
 // This starter template is using Vue 3 <script setup> SFCs
 // Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
-import {defineComponent, ref, watch, watchEffect} from 'vue'
+import {defineComponent, ref, watch} from 'vue'
 import Header from './components/Header.vue'
 import Asset from './components/Asset.vue'
 import Notification from './components/Notification.vue'
+import ErrorBoundary from './components/errorBoundary/ErrorBoundary.vue'
+import DefaultFallback from './components/errorBoundary/DefaultFallback.vue'
 
 const loggedIn = ref<Boolean>(false)
 const type = ref<String>('')
@@ -29,14 +31,16 @@ watch(loggedIn, () => {
 
 <template>
   <Header :loggedIn="loggedIn" @set-status="login"/>
-  <Asset :loggedIn="loggedIn"/>
+  <ErrorBoundary :fall-back="DefaultFallback" :stopPropagation="true">
+    <Asset :loggedIn="loggedIn"/>
+  </ErrorBoundary>
   <Notification :type="type" :message="message" @clear-notification="reset"/>
 </template>
 
 <script lang="ts">
   export default defineComponent({
     name: "App",
-    components: {Header, Asset, Notification},
+    components: {Header, Asset, Notification, ErrorBoundary, DefaultFallback},
   });
 </script>
 
