@@ -11,10 +11,12 @@ const tokens = ref<any>({})
 const fetchTokens = async () => {
   if(props.loggedIn) {
     const res = await $assetApi.getTokensAccount()
-    tokens.value = res;
+    const sortedValue = sortDecending(res, 'balance')
+    tokens.value = sortedValue;
   } else {
     const res = await $assetApi.getTokens()
-    tokens.value = res;
+    const sortedValue = sortDecending(res, 'totalSupply')
+    tokens.value = sortedValue;
   }
 }
 
@@ -26,6 +28,11 @@ const sum = (tokens: any) => {
     totalVal = math('plus', totalVal, estimatedVal)
   }
   return totalVal
+}
+
+const sortDecending = (tokens: any, base: string) => {
+  const arr = Object.values(tokens);
+  return arr.sort((a:any, b:any) => Number(b[base]) - Number(a[base]))
 }
 
 onMounted(async () => {
@@ -73,8 +80,8 @@ watchEffect(async () => {
             <span>{{token.symbol}}</span>
           </td>
           <td>
-            <em v-if="loggedIn">{{token.balance}}</em>
-            <em v-else>{{token.totalSupply}}</em>
+            <em class="balance" v-if="loggedIn">{{token.balance}}</em>
+            <em data-test="total-supply" v-else>{{token.totalSupply}}</em>
           </td>
           <td>$ <em>{{token.USDValue}}</em></td>
 

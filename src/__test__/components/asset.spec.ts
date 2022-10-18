@@ -2,12 +2,9 @@ import { mount } from '@vue/test-utils'
 import Asset from '../../components/Asset.vue';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { $assetApi } from '../../services/api.service'
-import { tokens, tokens_account } from '../../dummy/tokens.json'
-import { math } from '../../utils/math' 
+import { tokens as tokensData, tokens_account as tokensAccountData } from '../../dummy/tokens.json' 
+import { BigNumber } from "bignumber.js";
 
-// beforeEach(() => {
-
-// })
 
 describe("MyAsset.vue 테스트", () => {
   test("로그인 시 타이틀은 'My'", () => {
@@ -25,6 +22,54 @@ describe("MyAsset.vue 테스트", () => {
     });
     const h1 = wrapper.find('h1');
     expect(h1.text()).toMatch('All'); 
+  });
+  test("미로그인 시 발행량 기준으로 내림차순", async () => {
+    const wrapper = mount(Asset, {
+      props: { 
+        loggedIn : false
+      }
+    });
+
+    // idea1: 대상 값에 해당하는 element들을 조회하여 a > b > c .. 인지 확인 => failed
+    // const totalSupply = wrapper.find('.balance')
+    // console.log({totalSupply})
+
+    // idea2: sorting 된 상태의 데이터 검증
+    $assetApi.getTokens = vi.fn().mockResolvedValue(tokensData.payload)
+    const tokens =  await $assetApi.getTokens()
+
+    const sortedTokens = wrapper.vm.sortDecending(tokens, 'totalSupply')
+    
+    for(let i = 0; i < sortedTokens.length; i++ ) {
+      if(!sortedTokens[i+1]) {
+        return
+      }
+      const curr = new BigNumber(sortedTokens[i].totalSupply);
+      const next = new BigNumber(sortedTokens[i+1].totalSupply);
+      // console.log(curr.isGreaterThanOrEqualTo(next))
+      expect(curr.isGreaterThanOrEqualTo(next)).toBe(true)
+    }
+  });
+  test("로그인 시 보유량 기준으로 내림차순", async () => {
+    const wrapper = mount(Asset, {
+      props: { 
+        loggedIn : true
+      }
+    });
+
+    $assetApi.getTokens = vi.fn().mockResolvedValue(tokensAccountData.payload)
+    const tokens =  await $assetApi.getTokensAccount()
+
+    const sortedTokens = wrapper.vm.sortDecending(tokens, 'balance')
+    
+    for(let i = 0; i < sortedTokens.length; i++ ) {
+      if(!sortedTokens[i+1]) {
+        return
+      }
+      const curr = new BigNumber(sortedTokens[i].balance);
+      const next = new BigNumber(sortedTokens[i+1].balance);
+      expect(curr.isGreaterThanOrEqualTo(next)).toBe(true)
+    }
   });
   test("미로그인 시 보유량 햡계를 sum div에 디스플레이: 0", () => {
     const wrapper = mount(Asset, {
@@ -47,7 +92,7 @@ describe("MyAsset.vue 테스트", () => {
     });
 
     // tokens_account api mocking
-    $assetApi.getTokensAccount = vi.fn().mockResolvedValue(tokens_account.payload)
+    $assetApi.getTokensAccount = vi.fn().mockResolvedValue(tokensAccountData.payload)
 
     const tokens = await $assetApi.getTokensAccount()
     for(const symbol in tokens) {
@@ -64,9 +109,5 @@ describe("MyAsset.vue 테스트", () => {
 
     // failed again! 
     // expect(wrapper.vm.total).toMatch('8')
-  });
-  test("미로그인 시 발행량 기준으로 내림차순", () => {
-  });
-  test("로그인 시 보유량 기준으로 내림차순", () => {
   });
 })
