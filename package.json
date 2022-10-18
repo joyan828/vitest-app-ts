@@ -7,7 +7,7 @@
     "serve": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
-    "test": "vitest --coverage",
+    "test": "vitest --coverage --ui",
     "mock": "json-server --watch ./src/dummy/tokens.json --port 3000"
   },
   "dependencies": {
@@ -17,6 +17,7 @@
   "devDependencies": {
     "@vitejs/plugin-vue": "^3.1.0",
     "@vitest/coverage-c8": "^0.24.1",
+    "@vitest/ui": "^0.24.3",
     "@vue/test-utils": "^2.0.0-rc.18",
     "bignumber.js": "^9.1.0",
     "happy-dom": "^7.5.12",
