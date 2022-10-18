@@ -38,10 +38,10 @@ watch(loggedIn, () => {
 </template>
 
 <script lang="ts">
-  export default defineComponent({
+  export default {
     name: "App",
     components: {Header, Asset, Notification, ErrorBoundary, DefaultFallback},
-  });
+  };
 </script>
 
 <style>

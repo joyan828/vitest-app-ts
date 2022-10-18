@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, defineComponent, onMounted, watchEffect } from 'vue'
+import { ref, onMounted, watchEffect } from 'vue'
 import { math } from '../utils/math'
 import { $assetApi } from '../services/api.service'
 
@@ -18,14 +18,14 @@ const fetchTokens = async () => {
   }
 }
 
-const sum = () => {
+const sum = (tokens: any) => {
   let totalVal = '0';
-    for(const symbol in tokens.value) {
-      const token = tokens.value[symbol]
-      const estimatedVal = math('mul', token.USDValue, token.balance)
-      totalVal = math('plus', totalVal, estimatedVal)
-    }
-    return totalVal
+  for(const symbol in tokens) {
+    const token = tokens[symbol]
+    const estimatedVal = math('mul', token.USDValue, token.balance)
+    totalVal = math('plus', totalVal, estimatedVal)
+  }
+  return totalVal
 }
 
 onMounted(async () => {
@@ -35,7 +35,7 @@ onMounted(async () => {
 watchEffect(async () => { 
   await fetchTokens()
   if(props.loggedIn) {
-    total.value = sum()
+    total.value = sum(tokens.value)
   } else {
     total.value = '0'
   }
@@ -90,7 +90,7 @@ watchEffect(async () => {
 </template>
 
 <script lang="ts">
-export default defineComponent({
+export default {
   name: "Asset",
   props: {
     loggedIn: {
@@ -98,7 +98,7 @@ export default defineComponent({
       required: true,
     },
   },
-});
+};
 </script>
 
 <style scoped>

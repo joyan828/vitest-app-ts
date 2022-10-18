@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import {defineComponent} from 'vue'
 </script>
 
 <template>
@@ -39,7 +38,7 @@ import {defineComponent} from 'vue'
   </div>
 </template>
 <script lang="ts">
-  export default defineComponent({
+  export default {
     name: "Notification",
     emits: ['clear-notification'],
     props: {
@@ -52,7 +51,7 @@ import {defineComponent} from 'vue'
         default: null,
       },
     },
-  });
+  };
 </script>
 
 <style>
